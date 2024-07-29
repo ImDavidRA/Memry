@@ -1,0 +1,10 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <!-- Definimos los bordes redondos y el color del relleno transparente -->
+            <corners android:radius="50dp" />
+            <stroke android:color="@color/green" android:width="2dp" /> <!-- Ancho del borde y color rojo -->
+            <solid android:color="@android:color/transparent" /> <!-- Relleno transparente -->
+        </shape>
+    </item>
+</selector>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "615334199730",
+    "project_id": "memry--app",
+    "storage_bucket": "memry--app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:615334199730:android:b0abf1cfbebe2d1d6ce4ab",
+        "android_client_info": {
+          "package_name": "com.example.memry"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWITJNY0NYUEXkeclZzlm1PhvJUlgyAAc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
