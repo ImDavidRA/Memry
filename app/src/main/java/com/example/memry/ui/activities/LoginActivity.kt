@@ -1,5 +1,6 @@
 package com.example.memry.ui.activities
 
+import android.Manifest
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -18,14 +20,15 @@ import com.google.firebase.auth.FirebaseAuth
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var fAuth: FirebaseAuth
+    private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
-        fAuth = FirebaseAuth.getInstance()
+        firebaseAuth = FirebaseAuth.getInstance()
 
-        val currentUser = fAuth.currentUser
+        var currentUser = firebaseAuth.currentUser
 
         if (currentUser != null) {
             if (currentUser.isEmailVerified) {
@@ -37,12 +40,16 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        enableEdgeToEdge()
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        // PARA NO ESCRIBIR EL CORREO TO EL RATO
+        binding.rellenar.setOnClickListener {
+            binding.userEdt.setText("lendobar@gmail.com")
+            binding.passwrdEdt.setText("David200")
         }
 
         binding.txtRegister.setOnClickListener {
@@ -58,12 +65,12 @@ class LoginActivity : AppCompatActivity() {
             val pass = binding.passwrdEdt.text.toString()
 
             if (check_fields(email, pass))
-                fAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener {
+                firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener {
                     if (it.isSuccessful) {
 
-                        val user = currentUser!!
+                        currentUser = firebaseAuth.currentUser
 
-                        if (user.isEmailVerified) {
+                        if (currentUser!!.isEmailVerified) {
 
                             startActivity(Intent(this, ActivityPrincipal::class.java))
                             finish()
@@ -72,11 +79,12 @@ class LoginActivity : AppCompatActivity() {
 
                             mostrar_dialog()
                         }
+
+
                     } else
                         Toast.makeText(this, "Credenciales erroneas", Toast.LENGTH_SHORT).show()
                 }
         }
-
     }
 
     private fun mostrar_dialog() {

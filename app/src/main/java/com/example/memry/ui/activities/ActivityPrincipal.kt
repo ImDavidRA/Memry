@@ -39,18 +39,20 @@ class ActivityPrincipal : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
 
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+
         ActivityCompat.requestPermissions(
             this,
             arrayOf(
                 Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ),
+                Manifest.permission.READ_MEDIA_AUDIO,
+                Manifest.permission.READ_MEDIA_IMAGES,
+                Manifest.permission.READ_MEDIA_VIDEO,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE),
             0
         )
-
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         fAuth = FirebaseAuth.getInstance()
 
@@ -107,6 +109,7 @@ class ActivityPrincipal : AppCompatActivity() {
         binding .txtEmail.text = fAuth.currentUser?.email.toString()
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         fAuth.signOut()
         startActivity(Intent(this, LoginActivity::class.java))
