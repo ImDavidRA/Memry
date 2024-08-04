@@ -29,7 +29,14 @@ class AdapterTest(private val audioList: List<Audios>) : RecyclerView.Adapter<Ad
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentAudio = audioList[position]
         holder.titleTextView.text = currentAudio.title
-        holder.durationTextView.text = currentAudio.duration
+        val durationSecs = currentAudio.duration
+
+        // Formateo del texto de la duración
+        val minutes = durationSecs / 60
+        val seconds = durationSecs % 60
+        val formattedDuration = String.format("%d:%02d", minutes, seconds)
+
+        holder.durationTextView.text = formattedDuration
 
         // Set initial visibility of icons
         holder.playIcon.visibility = if (position == currentPlayingPosition && mediaPlayer?.isPlaying == true) View.GONE else View.VISIBLE

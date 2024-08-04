@@ -150,9 +150,16 @@ class TestActivity : AppCompatActivity() {
                 Toast.makeText(this, "Recording stopped!", Toast.LENGTH_SHORT).show()
                 val i = audioList.size + 1
 
-                //TODO: Borrar luego
-                val testTitulo = output.toString()
-                audioList.add(Audios(testTitulo, "1:50", output))
+                // Utilizamos el archivo para guardar la duración
+                val mediaPlayer = MediaPlayer()
+                mediaPlayer.setDataSource(output)
+                mediaPlayer.prepare()
+                val durationInSeconds = mediaPlayer.duration / 1000 // Duración en segundos
+                mediaPlayer.release()
+
+                // Testeando el titulo del audio
+                val testTitulo = output.toString().substringAfter("cache/").substringBefore(".mp3")
+                audioList.add(Audios(testTitulo, durationInSeconds, output))
 
                 adapter.notifyDataSetChanged()
             } catch (e: RuntimeException) {
@@ -163,6 +170,8 @@ class TestActivity : AppCompatActivity() {
             Toast.makeText(this, "You are not recording right now!", Toast.LENGTH_SHORT).show()
         }
     }
+
+
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
