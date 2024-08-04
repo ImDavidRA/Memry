@@ -1,6 +1,5 @@
 package com.example.memry.ui.activities
 
-import android.Manifest
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +8,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -89,10 +87,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun mostrar_dialog() {
         val dialogVerify = Dialog(this)
-        dialogVerify.setContentView(R.layout.pop_up_verifica_email)
+        dialogVerify.setContentView(R.layout.dialog_verifica_email)
         dialogVerify.window?.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         dialogVerify.window?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.custom_dialog_bg))
         dialogVerify.setCancelable(false)
+        dialogVerify.setCanceledOnTouchOutside(true)
 
         val cerrarDialogVerify: Button = dialogVerify.findViewById(R.id.confirmPop)
 

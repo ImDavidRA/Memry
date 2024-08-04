@@ -5,70 +5,160 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activities.ActivityPrincipal"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:context=".ui.activities.ActivityPrincipal">
 
-    <TextView
-        android:id="@+id/txt_login"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/top_banner"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login hecho"
-        android:textAlignment="center"
-        android:textColor="@color/blue"
-        android:textSize="24dp"
-        android:textStyle="bold"
+        android:background="@android:color/white"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:elevation="10dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:elevation="50dp">
+
+            <ImageView
+                android:id="@+id/img_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:layout_marginBottom="15dp"
+                android:src="@drawable/baseline_settings_24"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+            <ImageView
+                android:id="@+id/img_profile_pic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginBottom="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/baseline_emoji_emotions_24" />
+
+            <TextView
+                android:id="@+id/txt_welcome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:text="Bienvenido, usuario!"
+                android:textAlignment="center"
+                android:textColor="@color/blue"
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="@+id/img_profile_pic"
+                app:layout_constraintEnd_toStartOf="@+id/img_settings"
+                app:layout_constraintStart_toEndOf="@+id/img_profile_pic"
+                app:layout_constraintTop_toTopOf="@+id/img_profile_pic" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/top_banner"
+        android:orientation="vertical"
+        android:gravity="center">
 
-    <TextView
-        android:id="@+id/txt_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="TextView"
-        android:textAlignment="center"
-        android:textColor="@color/blue"
-        android:textSize="16sp"
-        android:textStyle="bold"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/empty_bg_img" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="¿Te olvidaste de algo?"
+                android:textAlignment="center"
+                android:textColor="@color/design_default_color_on_secondary"
+                android:textSize="25dp"
+
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@+id/imageView2"
+
+                app:layout_constraintStart_toStartOf="@+id/imageView2"
+                app:layout_constraintTop_toBottomOf="@+id/imageView2"
+
+                />
+
+            <TextView
+                android:id="@+id/txt_empty"
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Vaya, parece que aún no has creado recordatorios\n ¡Empieza a añadirlos!"
+                android:textAlignment="center"
+                android:textColor="@color/design_default_color_on_secondary"
+
+                android:textSize="15dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="@+id/imageView2"
+
+                app:layout_constraintStart_toStartOf="@+id/imageView2"
+                app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+            <Button
+                android:id="@+id/btn_comencemos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="32dp"
+                android:backgroundTint="@color/green"
+                android:text="Comencemos"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+
+                app:layout_constraintEnd_toEndOf="@+id/txt_empty"
+                app:layout_constraintStart_toStartOf="@+id/txt_empty"
+                app:layout_constraintTop_toBottomOf="@+id/txt_empty"
+
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_login" />
+        app:layout_constraintTop_toBottomOf="@+id/top_banner"
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_rec_audio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
-        android:layout_marginBottom="80dp"
-        android:text="Record"
-        android:textColor="@color/white"
-        android:background="@drawable/red_button_background"
-        app:layout_constraintBottom_toTopOf="@+id/txt_login"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:visibility="gone"
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_play_audio"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="80dp"
-        android:layout_marginBottom="80dp"
-        android:text="Play"
-        android:textColor="@color/blue"
-        android:background="@drawable/bg_borde_verde"
-        app:layout_constraintBottom_toTopOf="@+id/txt_login"
-        app:layout_constraintStart_toStartOf="parent" />
+        >
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_stop_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="84dp"
-        android:layout_marginBottom="144dp"
-        android:background="@drawable/bg_borde_verde"
-        android:text="Stop Play"
-        android:textColor="@color/blue"
-        app:layout_constraintBottom_toTopOf="@+id/txt_login"
-        app:layout_constraintStart_toStartOf="parent" />
+    </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

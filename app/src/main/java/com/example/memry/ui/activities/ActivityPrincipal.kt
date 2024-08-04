@@ -1,65 +1,54 @@
 package com.example.memry.ui.activities
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import android.Manifest
 import android.annotation.SuppressLint
-import android.view.MotionEvent
+import android.app.AlarmManager
+import android.app.DatePickerDialog
+import android.app.Dialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.os.Bundle
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.memry.R
 import com.example.memry.databinding.ActivityPrincipalBinding
-import com.example.memry.playback.AndroidAudioPlayer
-import com.example.memry.recorder.AndroidAudioRecorder
+import com.example.memry.helpers.AlarmReceiver
 import com.google.firebase.auth.FirebaseAuth
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.Calendar
 
 class ActivityPrincipal : AppCompatActivity() {
 
     private lateinit var binding: ActivityPrincipalBinding
     private lateinit var fAuth: FirebaseAuth
+    private lateinit var datePickerDialog: DatePickerDialog
+    private lateinit var dateButton : Button
 
-    private val recorder by lazy {
-        AndroidAudioRecorder(applicationContext)
-    }
-
-    private val player by lazy {
-        AndroidAudioPlayer(applicationContext)
-    }
-
-    private var audioFile: File? = null
+    private val RC_NOTIFICATION = 99
+    private val ALARM_REQUEST_CODE = 100
 
     @SuppressLint("ClickableViewAccessibility")
-    override fun onCreate(savedInstanceState: Bundle?) {
-
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.READ_MEDIA_AUDIO,
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.READ_MEDIA_VIDEO,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE),
-            0
-        )
 
         fAuth = FirebaseAuth.getInstance()
 
         binding = ActivityPrincipalBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        updateTexts()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -67,46 +56,169 @@ class ActivityPrincipal : AppCompatActivity() {
             insets
         }
 
-        binding.btnRecAudio.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    // Start recording
-                    File(cacheDir, fileName()).also {
-                        it.parentFile?.mkdirs()
-                        recorder.start(it)
-                        audioFile = it
-                    }
-                    true
-                }
-                MotionEvent.ACTION_UP -> {
-                    // Stop recording
-                    recorder.stop()
-                    true
-                }
-                else -> false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.VIBRATE), RC_NOTIFICATION)
+        }
+
+        binding.btnComencemos.setOnClickListener {
+            //showDialogMemoria()
+            startActivity(Intent(this, TestActivity::class.java))
+            finish()
+        }
+
+        binding.imgSettings.setOnClickListener {
+            showDialogMemoria()
+        }
+    }
+
+    // Pedir permisos
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == RC_NOTIFICATION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Allowed", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Denied", Toast.LENGTH_SHORT).show()
             }
         }
-
-        binding.btnPlayAudio.setOnClickListener {
-            player.playFile(audioFile ?: return@setOnClickListener)
-        }
-
-        binding.btnStopPlay.setOnClickListener {
-            player.stop()
-        }
-
     }
 
-    fun fileName(): String {
-        val formatter = SimpleDateFormat("dd_MM_yyyy_HH:mm", Locale.getDefault())
-        val currentDateTime = Date()
-        val formattedDateTime = formatter.format(currentDateTime)
+    private fun initDatePicker(
+    ) {
+        val dateSetListener = DatePickerDialog.OnDateSetListener { _, year, month, day ->
+            val monthAdjusted = month + 1
+            dateButton.text = "$day/$monthAdjusted/$year"
+        }
 
-        return "audio_$formattedDateTime.mp3"
+        val cal: Calendar = Calendar.getInstance()
+        val year = cal.get(Calendar.YEAR)
+        val month = cal.get(Calendar.MONTH)
+        val day = cal.get(Calendar.DAY_OF_MONTH)
+
+        val style = android.app.AlertDialog.THEME_DEVICE_DEFAULT_DARK
+
+        datePickerDialog = DatePickerDialog(this, style, dateSetListener, year, month, day)
     }
 
-    fun updateTexts() {
-        binding .txtEmail.text = fAuth.currentUser?.email.toString()
+    private fun showDialogMemoria() {
+
+        initDatePicker()
+
+        val dialogMemory = Dialog(this)
+        dialogMemory.setContentView(R.layout.dialog_new_memory)
+        dialogMemory.window?.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialogMemory.window?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.custom_dialog_bg))
+        dialogMemory.setCancelable(false)
+        dialogMemory.setCanceledOnTouchOutside(true)
+
+        // Variables tipo botones y textos
+        val date_button: Button = dialogMemory.findViewById(R.id.datePickerButton)
+        val aceptar_dialog_memory: Button = dialogMemory.findViewById(R.id.confirmPop)
+        val cerrar_dialog_memory: Button = dialogMemory.findViewById(R.id.cancelPop)
+        val edt_hora: EditText = dialogMemory.findViewById(R.id.edt_hora)
+        val edt_nombre : EditText = dialogMemory.findViewById(R.id.edt_nombre)
+
+        // Para obtener los valores actuales del día y la hora
+        val cal: Calendar = Calendar.getInstance()
+        val year = cal.get(Calendar.YEAR)
+        val month = cal.get(Calendar.MONTH) + 1
+        val day = cal.get(Calendar.DAY_OF_MONTH)
+        val hora = cal.get(Calendar.HOUR_OF_DAY)
+        val minutos = cal.get(Calendar.MINUTE)
+
+        date_button.setText("$day/$month/$year")
+        edt_hora.setText("$hora:$minutos")
+
+        date_button.setOnClickListener {
+            datePickerDialog.show()
+        }
+
+        aceptar_dialog_memory.setOnClickListener {
+            createNotificationChannel()
+
+            // TODO: Cambiar para hacerlo con un dropdown
+            //val reason = "Cumpleaños"
+
+            val title = if (edt_nombre.text.toString().isBlank()) {
+                null
+            } else {
+                edt_nombre.text.toString().replaceFirstChar { it.uppercaseChar() }
+            }
+
+            // Para obtener el valor de horas y minutos del texto
+            val hourText = edt_hora.text.toString()
+            val hour = hourText.split(":")[0].toInt()
+            val min = hourText.split(":")[1].toInt()
+
+            setAlarm(year, month, day, hour, min, title)
+            dialogMemory.dismiss()
+        }
+
+        cerrar_dialog_memory.setOnClickListener {
+            dialogMemory.dismiss()
+        }
+
+        dialogMemory.show()
+    }
+
+    // Permite poner una alarma con la fecha especificada
+    private fun setAlarm(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int,
+        minute: Int,
+        title: String?
+    ) {
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month - 1)
+            set(Calendar.DAY_OF_MONTH, day)
+            set(Calendar.HOUR_OF_DAY, hour)
+            set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
+        }
+
+        scheduleAlarm(this, calendar.timeInMillis, title)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "alarm_channel_id"
+            val channelName = "Alarm Channel"
+            val channelDescription = "Channel for alarm notifications"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+
+            val notificationChannel = NotificationChannel(channelId, channelName, importance).apply {
+                description = channelDescription
+            }
+
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
+    private fun scheduleAlarm(
+        context: Context,
+        triggerTime: Long,
+        title: String?
+    ) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
+            putExtra("title", title)
+            //putExtra("reason", reason)
+        }
+        val pendingIntent = PendingIntent.getBroadcast(context, ALARM_REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+
+        Toast.makeText(this, "Alarma programada", Toast.LENGTH_SHORT).show()
     }
 
     @SuppressLint("MissingSuperCall")
@@ -115,5 +227,4 @@ class ActivityPrincipal : AppCompatActivity() {
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
     }
-
 }

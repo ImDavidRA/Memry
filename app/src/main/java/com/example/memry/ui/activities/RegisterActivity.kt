@@ -64,10 +64,11 @@ class RegisterActivity : AppCompatActivity() {
 
     private fun mostrar_dialog() {
         val dialogVerify = Dialog(this)
-        dialogVerify.setContentView(R.layout.pop_up_verifica_email)
+        dialogVerify.setContentView(R.layout.dialog_verifica_email)
         dialogVerify.window?.setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         dialogVerify.window?.setBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.custom_dialog_bg))
         dialogVerify.setCancelable(false)
+        dialogVerify.setCanceledOnTouchOutside(true)
 
         val cerrarDialogVerify: Button = dialogVerify.findViewById(R.id.confirmPop)
 
