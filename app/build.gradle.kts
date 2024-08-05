@@ -61,7 +61,6 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.github.ColdTea-Projects:SmplrAlarm:2.1.1")
     implementation(libs.androidx.recyclerview)
 
     implementation(libs.androidx.core.ktx)

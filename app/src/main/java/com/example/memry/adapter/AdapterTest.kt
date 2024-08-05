@@ -41,22 +41,18 @@ class AdapterTest(private val audioList: List<Audios>, private val context: Cont
 
         // Inicializar visibilidad basada en el estado del MediaPlayer
         if (position == currentPlayingPosition && grabadora.get_media_player()?.isPlaying == true) {
-            holder.playIcon.visibility = View.GONE
-            holder.pauseIcon.visibility = View.VISIBLE
+            show_play(holder, false)
         } else {
-            holder.playIcon.visibility = View.VISIBLE
-            holder.pauseIcon.visibility = View.GONE
+            show_play(holder, true)
         }
 
         holder.playIcon.setOnClickListener {
             if (grabadora.get_media_player() == null) {
                 grabadora.playAudio(currentAudio.output) {
-                    holder.playIcon.visibility = View.VISIBLE
-                    holder.pauseIcon.visibility = View.GONE
+                    show_play(holder, true)
                     grabadora.set_media_player(null)
                 }
-                holder.playIcon.visibility = View.GONE
-                holder.pauseIcon.visibility = View.VISIBLE
+                show_play(holder, false)
                 currentPlayingPosition = position
             } else if (position == currentPlayingPosition) {
                 // Toggle play/pause for the current audio
@@ -64,12 +60,10 @@ class AdapterTest(private val audioList: List<Audios>, private val context: Cont
                 if (mediaPlayer != null) {
                     if (mediaPlayer.isPlaying) {
                         mediaPlayer.pause()
-                        holder.playIcon.visibility = View.VISIBLE
-                        holder.pauseIcon.visibility = View.GONE
+                        show_play(holder, true)
                     } else {
                         mediaPlayer.start()
-                        holder.playIcon.visibility = View.GONE
-                        holder.pauseIcon.visibility = View.VISIBLE
+                        show_play(holder, false)
                     }
                 }
             } else {
@@ -83,12 +77,10 @@ class AdapterTest(private val audioList: List<Audios>, private val context: Cont
                 grabadora.set_media_player(null)
                 notifyItemChanged(currentPlayingPosition)
                 grabadora.playAudio(currentAudio.output) {
-                    holder.playIcon.visibility = View.VISIBLE
-                    holder.pauseIcon.visibility = View.GONE
+                    show_play(holder, true)
                     grabadora.set_media_player(null)
                 }
-                holder.playIcon.visibility = View.GONE
-                holder.pauseIcon.visibility = View.VISIBLE
+                show_play(holder, false)
                 currentPlayingPosition = position
             }
         }
@@ -96,8 +88,17 @@ class AdapterTest(private val audioList: List<Audios>, private val context: Cont
         holder.pauseIcon.setOnClickListener {
             grabadora.pausar_audio()
             // Actualiza la visibilidad cuando se pausa el audio
+            show_play(holder, true)
+        }
+    }
+
+    private fun show_play(holder: MyViewHolder, play_on: Boolean) {
+        if (play_on) {
             holder.playIcon.visibility = View.VISIBLE
             holder.pauseIcon.visibility = View.GONE
+        } else {
+            holder.playIcon.visibility = View.GONE
+            holder.pauseIcon.visibility = View.VISIBLE
         }
     }
 
