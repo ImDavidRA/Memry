@@ -2,12 +2,8 @@ package com.example.memry.ui.activities
 
 import AdapterTest
 import android.Manifest
-import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
-import android.media.MediaRecorder
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -17,19 +13,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memry.dataClasses.Audios
 import com.example.memry.databinding.ActivityTestBinding
-import java.io.IOException
-import java.util.Calendar
+import com.example.memry.helpers.Grabadora
 
 class TestActivity : AppCompatActivity() {
 
+
+    // TODO: Quitar al acabar la clase "Grabadora"
     private var output: String? = null
-    private var mediaRecorder: MediaRecorder? = null
-    private var state: Boolean = false
-    private var recordingStopped: Boolean = false
+
     private lateinit var binding: ActivityTestBinding
     private val audioList = mutableListOf<Audios>()
 
     private lateinit var adapter: AdapterTest
+
+    private var grabadora: Grabadora = Grabadora(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,21 +50,12 @@ class TestActivity : AppCompatActivity() {
                 )
                 ActivityCompat.requestPermissions(this, permissions, 0)
             } else {
-                setupMediaRecorder()
-                startRecording()
+                grabadora.grabar_audio()
             }
         }
 
         binding.playButton.setOnClickListener {
-            var player: MediaPlayer? = MediaPlayer().apply {
-                try {
-                    setDataSource(output)
-                    prepare()
-                    start()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
+            grabadora.play_audio(output)
         }
 
         binding.buttonStopRecording.setOnClickListener {
@@ -75,103 +63,32 @@ class TestActivity : AppCompatActivity() {
         }
 
         binding.buttonPauseRecording.setOnClickListener {
-            pauseRecording()
+            grabadora.test()
         }
-    }
-
-    private fun get_audio_string(): String {
-        val cal = Calendar.getInstance()
-        val y = cal.get(Calendar.YEAR).toString().padStart(4, '0')
-        val m = (cal.get(Calendar.MONTH) + 1).toString().padStart(2, '0')
-        val d = cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')
-        val h = cal.get(Calendar.HOUR_OF_DAY).toString().padStart(2, '0')
-        val min = cal.get(Calendar.MINUTE).toString().padStart(2, '0')
-        val s = cal.get(Calendar.SECOND).toString().padStart(2, '0')
-
-        return "${externalCacheDir?.absolutePath}/D${y}_${m}_${d}_H${h}_${min}_${s}_audio.mp3"
-    }
-
-    private fun setupMediaRecorder() {
-        output = get_audio_string()
-        mediaRecorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setOutputFile(output)
-        }
-    }
-
-    private fun startRecording() {
-        try {
-            mediaRecorder?.prepare()
-            mediaRecorder?.start()
-            state = true
-            Toast.makeText(this, "Recording started!", Toast.LENGTH_SHORT).show()
-        } catch (e: IllegalStateException) {
-            Toast.makeText(this, "IllegalStateException: ${e.message}", Toast.LENGTH_SHORT).show()
-            e.printStackTrace()
-        } catch (e: IOException) {
-            Toast.makeText(this, "IOException: ${e.message}", Toast.LENGTH_SHORT).show()
-            e.printStackTrace()
-        }
-    }
-
-    @SuppressLint("RestrictedApi", "SetTextI18n")
-    @TargetApi(Build.VERSION_CODES.N)
-    private fun pauseRecording() {
-        if (state) {
-            if (!recordingStopped) {
-                Toast.makeText(this, "Paused!", Toast.LENGTH_SHORT).show()
-                mediaRecorder?.pause()
-                recordingStopped = true
-                binding.buttonPauseRecording.text = "Resume"
-            } else {
-                resumeRecording()
-            }
-        }
-    }
-
-    @SuppressLint("RestrictedApi", "SetTextI18n")
-    @TargetApi(Build.VERSION_CODES.N)
-    private fun resumeRecording() {
-        Toast.makeText(this, "Resumed!", Toast.LENGTH_SHORT).show()
-        mediaRecorder?.resume()
-        binding.buttonPauseRecording.text = "Pause"
-        recordingStopped = false
     }
 
     private fun stopRecording() {
-        if (state) {
-            try {
-                mediaRecorder?.stop()
-                mediaRecorder?.release()
-                mediaRecorder = null
-                state = false
-                Toast.makeText(this, "Recording stopped!", Toast.LENGTH_SHORT).show()
-                val i = audioList.size + 1
+        if (grabadora.get_state()) {
+            grabadora.parar_grabacion()
 
-                // Utilizamos el archivo para guardar la duración
-                val mediaPlayer = MediaPlayer()
-                mediaPlayer.setDataSource(output)
-                mediaPlayer.prepare()
-                val durationInSeconds = mediaPlayer.duration / 1000 // Duración en segundos
-                mediaPlayer.release()
+            output = grabadora.get_output()
 
-                // Testeando el titulo del audio
-                val testTitulo = output.toString().substringAfter("cache/").substringBefore(".mp3")
-                audioList.add(Audios(testTitulo, durationInSeconds, output))
+            // Utilizamos el archivo para guardar la duración
+            val mediaPlayer = MediaPlayer()
+            mediaPlayer.setDataSource(output)
+            mediaPlayer.prepare()
+            val durationInSeconds = mediaPlayer.duration / 1000 // Duración en segundos
+            mediaPlayer.release()
 
-                adapter.notifyDataSetChanged()
-            } catch (e: RuntimeException) {
-                Toast.makeText(this, "RuntimeException: ${e.message}", Toast.LENGTH_SHORT).show()
-                e.printStackTrace()
-            }
+            // Testeando el titulo del audio
+            val testTitulo = output.toString().substringAfter("cache/").substringBefore(".mp3")
+            audioList.add(Audios(testTitulo, durationInSeconds, output))
+
+            adapter.notifyDataSetChanged()
         } else {
             Toast.makeText(this, "You are not recording right now!", Toast.LENGTH_SHORT).show()
         }
     }
-
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -181,8 +98,7 @@ class TestActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 0) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                setupMediaRecorder()
-                startRecording()
+                grabadora.grabar_audio()
             } else {
                 Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
             }

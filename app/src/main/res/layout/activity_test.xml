@@ -129,7 +129,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_centerHorizontal="true"
-                        android:text="Pause"
+                        android:text="Test"
                         android:textColor="@color/white"
                         app:layout_constraintBottom_toBottomOf="@+id/button_start_recording"
                         app:layout_constraintEnd_toStartOf="@+id/button_stop_recording"

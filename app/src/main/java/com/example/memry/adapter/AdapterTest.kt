@@ -7,12 +7,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.memry.R
 import com.example.memry.dataClasses.Audios
+import com.example.memry.helpers.Grabadora
 import java.io.IOException
 
 class AdapterTest(private val audioList: List<Audios>) : RecyclerView.Adapter<AdapterTest.MyViewHolder>() {
 
     private var mediaPlayer: MediaPlayer? = null
     private var currentPlayingPosition: Int = -1
+    private var grabadora: Grabadora = Grabadora(this)
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleTextView: TextView = itemView.findViewById(R.id.titleTextView)
@@ -29,11 +31,12 @@ class AdapterTest(private val audioList: List<Audios>) : RecyclerView.Adapter<Ad
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentAudio = audioList[position]
         holder.titleTextView.text = currentAudio.title
-        val durationSecs = currentAudio.duration
 
         // Formateo del texto de la duración
+        val durationSecs = currentAudio.duration
         val minutes = durationSecs / 60
         val seconds = durationSecs % 60
+
         val formattedDuration = String.format("%d:%02d", minutes, seconds)
 
         holder.durationTextView.text = formattedDuration
@@ -79,6 +82,9 @@ class AdapterTest(private val audioList: List<Audios>) : RecyclerView.Adapter<Ad
                 mediaPlayer?.release()
                 mediaPlayer = null
                 notifyItemChanged(currentPlayingPosition)
+
+                grabadora.play_audio(currentAudio.output)
+
                 mediaPlayer = MediaPlayer().apply {
                     try {
                         setDataSource(currentAudio.output)
