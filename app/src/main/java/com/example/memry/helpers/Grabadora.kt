@@ -10,12 +10,21 @@ import java.util.Calendar
 class Grabadora(private val context: Context) {
 
     private var mediaRecorder: MediaRecorder? = null
+    private var mediaPlayer: MediaPlayer? = null
     private var state: Boolean = false
     private var recordingStopped: Boolean = false
     private var output: String? = null
 
     fun test() {
         Toast.makeText(context, "Prueba Grabadora", Toast.LENGTH_SHORT).show()
+    }
+
+    fun get_media_player(): MediaPlayer? {
+        return mediaPlayer
+    }
+
+    fun set_media_player(newPlayer: MediaPlayer?) {
+        mediaPlayer = newPlayer
     }
 
     fun get_output(): String? {
@@ -31,17 +40,35 @@ class Grabadora(private val context: Context) {
         startRecording()
     }
 
-    fun play_audio(archivo: String?) {
-        var player: MediaPlayer? = MediaPlayer().apply {
+    fun pausar_audio() {
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
+        }
+    }
+
+    fun playAudio(archivo: String?, onCompletion: (() -> Unit)? = null) {
+        if (archivo == null) {
+            Toast.makeText(context, "Archivo no encontrado", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val player = MediaPlayer().apply {
             try {
                 setDataSource(archivo)
                 prepare()
                 start()
+                setOnCompletionListener {
+                    onCompletion?.invoke()
+                    release()
+                }
             } catch (e: IOException) {
                 e.printStackTrace()
+                release()
             }
         }
+        set_media_player(player) // Asegúrate de actualizar el MediaPlayer aquí
     }
+
 
     private fun setupMediaRecorder() {
         output = get_audio_string()
@@ -94,5 +121,4 @@ class Grabadora(private val context: Context) {
 
         return "${context.externalCacheDir?.absolutePath}/D${y}_${m}_${d}_H${h}_${min}_${s}_audio.mp3"
     }
-
 }

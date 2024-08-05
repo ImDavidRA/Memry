@@ -1,6 +1,5 @@
 package com.example.memry.ui.activities
 
-import AdapterTest
 import android.Manifest
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
@@ -11,6 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.memry.adapters.AdapterTest
 import com.example.memry.dataClasses.Audios
 import com.example.memry.databinding.ActivityTestBinding
 import com.example.memry.helpers.Grabadora
@@ -20,12 +20,9 @@ class TestActivity : AppCompatActivity() {
 
     // TODO: Quitar al acabar la clase "Grabadora"
     private var output: String? = null
-
     private lateinit var binding: ActivityTestBinding
     private val audioList = mutableListOf<Audios>()
-
     private lateinit var adapter: AdapterTest
-
     private var grabadora: Grabadora = Grabadora(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +32,7 @@ class TestActivity : AppCompatActivity() {
 
         val recyclerView: RecyclerView = binding.recycler
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = AdapterTest(audioList)
+        adapter = AdapterTest(audioList, this)
         recyclerView.adapter = adapter
 
         binding.buttonStartRecording.setOnClickListener {
@@ -55,7 +52,7 @@ class TestActivity : AppCompatActivity() {
         }
 
         binding.playButton.setOnClickListener {
-            grabadora.play_audio(output)
+            grabadora.playAudio(output)
         }
 
         binding.buttonStopRecording.setOnClickListener {
