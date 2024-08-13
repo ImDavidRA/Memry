@@ -74,16 +74,11 @@ class LoginActivity : AppCompatActivity() {
             val email = binding.userEdt.text.toString()
             val pass = binding.passwrdEdt.text.toString()
 
-            // Verifica que los campos no estén vacíos antes de proceder
             if (check_fields(email, pass)) {
                 // Intenta iniciar sesión con Firebase Authentication
                 firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        // Si el inicio de sesión es exitoso, obtiene el usuario actual
-                        currentUser = firebaseAuth.currentUser
-
                         currentUser?.let {
-                            // Verifica si el email del usuario ha sido verificado
                             if (it.isEmailVerified) {
                                 // Si el email está verificado, redirige a la actividad principal
                                 startActivity(Intent(this, ActivityPrincipal::class.java))
@@ -94,7 +89,7 @@ class LoginActivity : AppCompatActivity() {
                             }
                         } ?: run {
                             // Manejo de error en caso de que `currentUser` sea `null`
-                            Toast.makeText(this, "Error inesperado: usuario no disponible.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Error inesperado: usuario no encontrado.", Toast.LENGTH_SHORT).show()
                         }
                     } else {
                         // Muestra un mensaje si las credenciales son incorrectas
