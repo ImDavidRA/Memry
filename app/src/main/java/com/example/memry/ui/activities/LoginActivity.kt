@@ -40,20 +40,14 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
-        iniciar_botones(binding)
+        iniciar_botones()
     }
 
     /**
      *     Método utilizado para iniciar las funciones que realizan los botones
-     *     del binding pasado como parámetro.
-     *
-     *     Args:
-     *          binding (Binding): El XML con la información necesaria a utilizar.
-     *
-     *     Returns:
-     *          nada.
+     *     del binding pasado como parámetro.     *
      */
-    private fun iniciar_botones(binding: ActivityLoginBinding) {
+    private fun iniciar_botones() {
         // Botón para rellenar los campos de email y contraseña con valores predefinidos
         // TODO: Eliminar cuando acabe
         binding.rellenar.setOnClickListener {
