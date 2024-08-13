@@ -14,6 +14,8 @@ import com.example.memry.adapters.AdapterTest
 import com.example.memry.dataClasses.Audios
 import com.example.memry.databinding.ActivityTestBinding
 import com.example.memry.helpers.Grabadora
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class TestActivity : AppCompatActivity() {
 
@@ -25,10 +27,14 @@ class TestActivity : AppCompatActivity() {
     private lateinit var adapter: AdapterTest
     private var grabadora: Grabadora = Grabadora(this)
 
+    private lateinit var alarmasRef: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTestBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        alarmasRef = FirebaseDatabase.getInstance("https://memry--app-default-rtdb.europe-west1.firebasedatabase.app/").getReference("Alarmas")
 
         val recyclerView: RecyclerView = binding.recycler
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -59,8 +65,18 @@ class TestActivity : AppCompatActivity() {
             stopRecording()
         }
 
-        binding.buttonPauseRecording.setOnClickListener {
-            grabadora.test()
+        binding.buttonTestRecording.setOnClickListener {
+            Toast.makeText(this, "Antes de", Toast.LENGTH_SHORT).show()
+
+            val test: String = "5:30"
+
+            alarmasRef.child("Prueba").setValue(test).addOnCompleteListener {
+                    Toast.makeText(this, "Funcionó", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener { err ->
+                    Toast.makeText(this, "Error ${err.message}", Toast.LENGTH_SHORT).show()
+                }
+
+            Toast.makeText(this, "Despues de", Toast.LENGTH_SHORT).show()
         }
     }
 

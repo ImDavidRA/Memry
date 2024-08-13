@@ -26,12 +26,16 @@ import com.example.memry.R
 import com.example.memry.databinding.ActivityPrincipalBinding
 import com.example.memry.helpers.AlarmReceiver
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.util.Calendar
 
 class ActivityPrincipal : AppCompatActivity() {
 
     private lateinit var binding: ActivityPrincipalBinding
     private lateinit var fAuth: FirebaseAuth
+    private lateinit var database: FirebaseDatabase
+    private lateinit var dbReference: DatabaseReference
     private lateinit var datePickerDialog: DatePickerDialog
     private lateinit var dateButton : Button
 
@@ -46,6 +50,8 @@ class ActivityPrincipal : AppCompatActivity() {
         enableEdgeToEdge()
 
         fAuth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance()
+        dbReference = database.getReference("Alarmas")
 
         binding = ActivityPrincipalBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -57,7 +63,7 @@ class ActivityPrincipal : AppCompatActivity() {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.VIBRATE), RC_NOTIFICATION)
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS, Manifest.permission.VIBRATE, Manifest.permission.INTERNET), RC_NOTIFICATION)
         }
 
         binding.btnComencemos.setOnClickListener {
@@ -107,6 +113,8 @@ class ActivityPrincipal : AppCompatActivity() {
 
     private fun showDialogMemoria() {
 
+        addDatatoFirebase("La hora de la alarma ha sido X")
+
         initDatePicker()
 
         val dialogMemory = Dialog(this)
@@ -155,7 +163,8 @@ class ActivityPrincipal : AppCompatActivity() {
             val hour = hourText.split(":")[0].toInt()
             val min = hourText.split(":")[1].toInt()
 
-            setAlarm(year, month, day, hour, min, title)
+            //setAlarm(year, month, day, hour, min, title)
+
             dialogMemory.dismiss()
         }
 
@@ -165,6 +174,21 @@ class ActivityPrincipal : AppCompatActivity() {
 
         dialogMemory.show()
     }
+
+    private fun addDatatoFirebase(test: String) {
+        dbReference.setValue(test)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(applicationContext, "Data added", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(applicationContext, "Failed to add data: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(applicationContext, "Fail to add data: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
     // Permite poner una alarma con la fecha especificada
     private fun setAlarm(

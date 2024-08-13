@@ -16,6 +16,8 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.memry.R
 import com.example.memry.databinding.ActivityCreateAlarmBinding
 import com.example.memry.helpers.AlarmReceiver
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import java.util.Calendar
 
 class CreateAlarm : AppCompatActivity() {
@@ -24,9 +26,15 @@ class CreateAlarm : AppCompatActivity() {
     private lateinit var vibrator: Vibrator
     private val ALARM_REQUEST_CODE = 100
 
+    private lateinit var database: FirebaseDatabase
+    private lateinit var dbReference: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        database = FirebaseDatabase.getInstance()
+        dbReference = database.getReference("Test")
 
         binding = ActivityCreateAlarmBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -58,10 +66,16 @@ class CreateAlarm : AppCompatActivity() {
         }
 
         val button = binding.botonAceptar.setOnClickListener {
+
             setAlarm(datePicker.year, datePicker.month, datePicker.dayOfMonth, hourPicker.hour, hourPicker.minute, null)
         }
 
     }
+
+
+
+
+
 
     private fun setAlarm(
         year: Int,
