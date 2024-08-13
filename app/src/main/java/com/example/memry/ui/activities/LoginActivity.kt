@@ -61,6 +61,8 @@ class LoginActivity : AppCompatActivity() {
             binding.passwrdEdt.setText("David200")
         }
 
+        // TODO: Añadir botón para "Contraseña Olvidada"
+
         // Listener para redirigir a la actividad de registro
         binding.txtRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
